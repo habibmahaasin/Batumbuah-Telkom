@@ -104,7 +104,7 @@ func (h *userHandler) RegisterPlant(c *gin.Context) {
 		return
 	}
 
-	helpers.SetFlashMessage(c, "success", "Check-in successful")
+	helpers.SetFlashMessage(c, "success", "Plant registered successfully")
     c.Redirect(http.StatusFound, "/")
 }
 

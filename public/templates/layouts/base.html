@@ -10,14 +10,29 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="stylesheet" href="../../assets/css/styles.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
-          extend: {},
+          extend: {
+            colors: {
+              primary: "#405944",
+            },
+          },
         },
         daisyui: {
-          themes: ["light", "dark", "cupcake"],
+          themes: [
+            "light",
+            "dark",
+            "cupcake",
+            {
+              custom: {
+                primary: "#405944",
+              },
+            },
+          ],
         },
         plugins: [daisyui],
       };
@@ -37,11 +52,11 @@
     <div
       class="container mx-auto max-w-md bg-white min-h-[100vh] overflow-x-none"
     >
-      {{ if .title }} {{ template "content" . }} {{ if ne .title "Login" }} {{
-      template "navigation" . }} {{ end }} {{ end }}
+      {{ if .title }} {{ template "content" . }} {{ if and (ne .title "Login")
+      (ne .title "Plant Detail") }} {{ template "navigation" . }} {{ end }} {{
+      end }}
     </div>
   </body>
-
   <script>
     setTimeout(() => {
       const toastMessages = document.getElementsByClassName("toastMessage");

@@ -37,12 +37,12 @@ func setup() (*gorm.DB, config.Conf, *gin.Engine) {
 }
 
 func main() {
-	_, err := config.Init()
+	conf, err := config.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	router := routesV1.Init(setup()) //Version 1
-	router.Run()
-	// router.Run(":" + conf.App.Port)
+	// router.Run()
+	router.Run(":" + conf.App.Port)
 }

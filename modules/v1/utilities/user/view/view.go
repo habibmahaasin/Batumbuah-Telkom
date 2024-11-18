@@ -3,6 +3,7 @@ package view
 import (
 	"Batumbuah/pkg/helpers"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -45,16 +46,22 @@ func (h *userView) PlantDetail(c *gin.Context) {
 
     plant, _ := h.userService.GetPlantByID(plantID)
     checkInLogs, _ := h.userService.GetCheckInLogs(plantID)
-    // testInformation, _ := h.userService.GetTestInformationByPlantID(plantID)
     plantStats, _ := h.userService.GetPlantStatsById(plantID)
 
+    daysSinceLastCheckIn := 0
+    if len(checkInLogs) > 0 {
+        lastCheckIn := checkInLogs[len(checkInLogs)-1].DateCreated
+        daysSinceLastCheckIn = int(time.Since(lastCheckIn).Hours() / 24)
+    }
+
     c.HTML(http.StatusOK, "plant_detail.html", gin.H{
-        "title":          "Plant Detail",
-        "plant":          plant,
-        "status":         status,
-        "message":        message,
-        "checkInLogs":    checkInLogs,
-        // "testInformation": testInformation,
-        "plantStats":     plantStats,
+        "title":               "Plant Detail",
+        "plant":               plant,
+        "status":              status,
+        "message":             message,
+        "checkInLogs":         checkInLogs,
+        "sumCheckInLogs":      len(checkInLogs),
+        "daysSinceLastCheckIn": daysSinceLastCheckIn,
+        "plantStats":          plantStats,
     })
 }

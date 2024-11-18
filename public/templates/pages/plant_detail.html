@@ -1,12 +1,54 @@
 
 {{ define "content" }}
 {{ if .message }}
-  <div class="toastMessage toast toast-top toast-center transition-opacity duration-500">
+  <div class="toastMessage toast toast-top toast-center transition-opacity duration-500 z-[9999]">
     <div class="alert {{ if eq .status "success" }}alert-success{{ else }}alert-error{{ end }}">
-      <span>{{ .message }}</span>
+      <span class="text-white">{{ .message }}</span>
     </div>
   </div>
 {{ end }}
+
+<div class="h-[85vh] flex flex-col gap-3">
+  <div class="py-4 px-4 sticky top-0 z-[99] bg-[#405944] text-white shadow-xl">
+    <div class="w-full flex justify-between items-center">
+      <a href="/">
+        <iconify-icon icon="solar:square-alt-arrow-left-outline" class="text-[36px]"></iconify-icon>
+      </a>
+      <div class="flex flex-col gap-0">
+        <p class="text-md font-bold uppercase">{{ .plant.Name }}</p>
+      </div>
+    </div>
+    <div class="pt-4">
+      <ul class="steps w-full">
+        <li class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}">Week 1</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}">Week 2</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}">Week 3</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}">Week 4</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}">Week 5</li>
+      </ul>
+    </div>
+  </div>
+  <div class="flex flex-col gap-2 px-4 mt-4">
+    {{ if eq .sumCheckInLogs 0 }}
+     <h4 class="uppercase text-[#e79a3f] font-bold mb-1 text-center">No Check in history Available</h4>
+    {{ else }}
+      <h4 class="uppercase text-[#e79a3f] font-bold mb-1">Check in history</h4>
+      {{ range .checkInLogs }}
+        <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
+          <div class="collapse-title text-md font-sm">Progress <b>Week {{ .WeekNumber }}</b></div>
+          <div class="collapse-content text-xs flex flex-col gap-2">
+            <img src="../../assets/img/image-placeholder.webp" class="w-full h-48 object-cover rounded-md" />
+            <p><b>Note :</b> {{ .Note }}</p>
+            <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ .DateCreated }}</p>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+  </div>
+  <div class="fixed bottom-4 max-w-md w-full px-4">
+    <button class="w-full btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944]" onclick="check_in_modals.showModal()">Check In</button>
+  </div>
+</div>
 
 <!-- {{ if .userStats.IsPreTested }}
 {{ else }}
@@ -50,73 +92,26 @@
 </div>
 {{ end }} -->
 
-<div class="pt-8">
-  <ul class="steps w-full">
-    <li class="step font-semibold step-primary">Week 1</li>
-    <li class="step font-semibold">Week 2</li>
-    <li class="step font-semibold">Week 3</li>
-    <li class="step font-semibold">Week 4</li>
-    <li class="step font-semibold">Week 5</li>
-  </ul>
-</div>
-
-<div class="px-4 py-8">
-
-<div class="flex flex-col gap-4 mt-4">
-  <div>
-    <h2>Plant Detail</h2>
-    <ul>
-      <li>
-        <strong>Note:</strong> {{ .plant.Name }} <br />
-      </li>
-      <hr />
-    </ul>
+<dialog id="check_in_modals" class="modal">
+  <div class="modal-box max-w-sm">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="text-lg font-bold">Check In Form</h3>
+    <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
+      <input type="hidden" name="image" value="images.jpeg" />
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Note</span>
+        </label>
+        <textarea
+          name="note"
+          class="textarea textarea-bordered w-full"
+          placeholder="Enter a note (optional)"
+        ></textarea>
+      </div>
+      <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Konfirmasi</button>
+    </form>
   </div>
-
-  <div>
-    <h2>Plant Stats</h2>
-    <ul>
-      <li>
-        <strong>Note:</strong> {{ .plantStats.TotalCheckIn }} <br />
-        <strong>Time:</strong> {{ .plantStats.DateUpdated }} <br />
-      </li>
-      <hr />
-    </ul>
-  </div>
-
-  <div>
-    <h2>Check-In Logs</h2>
-    <ul>
-      {{ range .checkInLogs }}
-      <li>
-        <strong>Note:</strong> {{ .Note }} <br />
-        <strong>Time:</strong> {{ .DateCreated }} <br />
-      </li>
-      <hr />
-      {{ end }}
-    </ul>
-  </div>
-</div>
-
-  <!-- Check-In Form -->
-  <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
-    <!-- Hidden Image Field with Static Value -->
-    <input type="hidden" name="image" value="images.jpeg" />
-
-    <!-- Note Field -->
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text font-semibold">Note</span>
-      </label>
-      <textarea
-        name="note"
-        class="textarea textarea-bordered w-full"
-        placeholder="Enter a note (optional)"
-      ></textarea>
-    </div>
-
-    <!-- Submit Button -->
-    <button type="submit" class="btn btn-primary w-full">Check In</button>
-  </form>
-</div>
+</dialog>
 {{ end }}
