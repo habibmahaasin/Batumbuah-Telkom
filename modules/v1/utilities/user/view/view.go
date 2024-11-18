@@ -2,6 +2,7 @@ package view
 
 import (
 	"Batumbuah/pkg/helpers"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -47,12 +48,19 @@ func (h *userView) PlantDetail(c *gin.Context) {
     plant, _ := h.userService.GetPlantByID(plantID)
     checkInLogs, _ := h.userService.GetCheckInLogs(plantID)
     plantStats, _ := h.userService.GetPlantStatsById(plantID)
+    
+  for i := range checkInLogs {
+    checkInLogs[i].DateCreated = checkInLogs[i].DateCreated.In(time.Local)
+    checkInLogs[i].FormattedDateCreated = checkInLogs[i].DateCreated.Format("2006-01-02 15:04:05")
+}
 
     daysSinceLastCheckIn := 0
     if len(checkInLogs) > 0 {
         lastCheckIn := checkInLogs[len(checkInLogs)-1].DateCreated
         daysSinceLastCheckIn = int(time.Since(lastCheckIn).Hours() / 24)
     }
+
+    fmt.Println("sumCheckInLogs",len(checkInLogs))
 
     c.HTML(http.StatusOK, "plant_detail.html", gin.H{
         "title":               "Plant Detail",
@@ -63,5 +71,20 @@ func (h *userView) PlantDetail(c *gin.Context) {
         "sumCheckInLogs":      len(checkInLogs),
         "daysSinceLastCheckIn": daysSinceLastCheckIn,
         "plantStats":          plantStats,
+    })
+}
+
+func (h *userView) Profile(c *gin.Context) {
+    session := sessions.Default(c)
+    email := session.Get("email")
+    name := session.Get("full_name")
+    status, message := helpers.GetAndClearFlashMessage(c)
+
+    c.HTML(http.StatusOK, "profile.html", gin.H{
+        "title":       "Profile",
+        "status":      status,
+        "message":     message,
+        "email":       email,
+        "name":        name,
     })
 }

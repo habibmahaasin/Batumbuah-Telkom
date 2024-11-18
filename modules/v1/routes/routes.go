@@ -42,6 +42,7 @@ func Init(db *gorm.DB, conf config.Conf, router *gin.Engine) *gin.Engine {
 	user.GET("/login", middlewares.LoggedIn(), userViewV1.Login)
 	user.GET("/", middlewares.IsLogin(), userViewV1.Index)
 	user.GET("/plant/:id", middlewares.IsLogin(), userViewV1.PlantDetail)
+	user.GET("/profile", middlewares.IsLogin(), userViewV1.Profile)
 	// user.GET("/register", userViewV1.Register)
 
 	router = ParseTmpl(router)

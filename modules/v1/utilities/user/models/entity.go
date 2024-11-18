@@ -35,6 +35,7 @@ type CheckInLog struct {
     Note        string    `gorm:"column:note" json:"note"`
     DateCreated time.Time `gorm:"column:date_created" json:"date_created"`
     DateUpdated time.Time `gorm:"column:date_updated" json:"date_updated"`
+    FormattedDateCreated string `gorm:"-" json:"formatted_date_created"`
 }
 
 // PlantStats model definition

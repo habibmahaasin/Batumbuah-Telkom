@@ -38,23 +38,5 @@
       </a>
       {{ end }}
     </div>
-    <dialog id="my_modal_1" class="modal">
-      <div class="modal-box max-w-sm">
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-        </form>
-        <form method="post" action="/register-plant">
-          <label class="form-control w-full">
-            <div class="label">
-              <span class="label-text">What is your name?</span>
-            </div>
-            <input type="text" name="name" id="name" placeholder="Type here" class="input input-bordered w-full" />
-          </label>
-          <div class="modal-action">
-            <button class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944]  w-full" type="submit" >Submit</button>
-          </div>
-        </form>
-      </div>
-    </dialog>
   </div>
 {{ end }}

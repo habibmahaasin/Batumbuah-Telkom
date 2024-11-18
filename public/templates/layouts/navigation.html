@@ -1,4 +1,36 @@
 {{ define "navigation" }}
+<dialog id="my_modal_1" class="modal">
+  <div class="modal-box max-w-sm">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        ✕
+      </button>
+    </form>
+    <form method="post" action="/register-plant">
+      <label class="form-control w-full">
+        <div class="label">
+          <span class="label-text">What is your name?</span>
+        </div>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Type here"
+          class="input input-bordered w-full"
+        />
+      </label>
+      <div class="modal-action">
+        <button
+          class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full"
+          type="submit"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <div class="!left-auto !right-auto flex justify-center">
   <div
     class="btm-nav max-w-[26rem] !left-auto !right-auto mb-4 rounded-[32px] shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] h-[4.5rem]"
@@ -16,13 +48,13 @@
         class="text-[32px] bg-[#405944] text-white p-4 rounded-full shadow-[rgba(0,_0,_0,_0.25)_0px_25px_50px_-12px] border-4 border-white"
       ></iconify-icon>
     </button>
-    <button>
+    <a href="/profile">
       <iconify-icon
         icon="basil:user-outline"
         class="text-[26px]"
       ></iconify-icon>
       <p class="text-xs">Profile</p>
-    </button>
+    </a>
   </div>
 </div>
 {{ end }}

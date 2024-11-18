@@ -8,7 +8,32 @@
   </div>
 {{ end }}
 
-<div class="h-[85vh] flex flex-col gap-3">
+<div class="h-[85vh] flex flex-col gap-3">  
+  <dialog id="check_in_modals" class="modal">
+    <div class="modal-box max-w-sm">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <h3 class="text-lg font-bold">Check In Form</h3>
+      <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
+        <input type="hidden" name="image" value="images.jpeg" />
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Note</span>
+          </label>
+          <textarea
+            name="note"
+            class="textarea textarea-bordered w-full"
+            placeholder="Enter a note (optional)"
+          ></textarea>
+        </div>
+        <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Konfirmasi</button>
+      </form>
+    </div>
+  </dialog>
+  <div class="fixed bottom-4 max-w-md w-full px-4">
+    <button class="w-full btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944]" onclick="check_in_modals.showModal()">Check In</button>
+  </div>
   <div class="py-4 px-4 sticky top-0 z-[99] bg-[#405944] text-white shadow-xl">
     <div class="w-full flex justify-between items-center">
       <a href="/">
@@ -35,23 +60,19 @@
       <h4 class="uppercase text-[#e79a3f] font-bold mb-1">Check in history</h4>
       {{ range .checkInLogs }}
         <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
-          <div class="collapse-title text-md font-sm">Progress <b>Week {{ .WeekNumber }}</b></div>
+          <div class="collapse-title text-md font-sm"><b>Check In : </b>{{ .FormattedDateCreated }}</div>
           <div class="collapse-content text-xs flex flex-col gap-2">
             <img src="../../assets/img/image-placeholder.webp" class="w-full h-48 object-cover rounded-md" />
             <p><b>Note :</b> {{ .Note }}</p>
-            <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ .DateCreated }}</p>
+            <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ .FormattedDateCreated }}</p>
           </div>
         </div>
       {{ end }}
     {{ end }}
   </div>
-  <div class="fixed bottom-4 max-w-md w-full px-4">
-    <button class="w-full btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944]" onclick="check_in_modals.showModal()">Check In</button>
-  </div>
 </div>
 
-<!-- {{ if .userStats.IsPreTested }}
-{{ else }}
+{{ if eq .sumCheckInLogs 0 }}
 <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
   <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -67,7 +88,7 @@
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn btn-primary w-full" onclick="showForm(event)">Proceed with Pre-Test</button>
+            <button class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full" onclick="showForm(event)">Proceed with Pre-Test</button>
           </div>
         </div>
          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container">
@@ -79,39 +100,61 @@
               </div>
             </div>
           </div>
-          <form action="/pretest-confirmation" method="POST" class="py-3 flex flex-col gap-2 mt-2">
+          <form action="/check-in/{{.plant.PlantID}}" method="POST" class="py-3 flex flex-col gap-2 mt-2">
               <label for="user_input" class="text-sm font-semibold">Email</label>
-              <input type="email" name="email" id="email" placeholder="Enter your response" class="w-full p-2 border rounded">
-              <input type="hidden" name="status" value="true">
-              <button type="submit" class="btn btn-primary w-full mt-2">Submit</button>
+              <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
+              <input type="hidden" name="image" value="images.jpeg" />
+              <!-- <input type="hidden" name="status" value="true"> -->
+              <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Submit</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-{{ end }} -->
+{{ else }}
+{{ end }}
 
-<dialog id="check_in_modals" class="modal">
-  <div class="modal-box max-w-sm">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <h3 class="text-lg font-bold">Check In Form</h3>
-    <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
-      <input type="hidden" name="image" value="images.jpeg" />
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text font-semibold">Note</span>
-        </label>
-        <textarea
-          name="note"
-          class="textarea textarea-bordered w-full"
-          placeholder="Enter a note (optional)"
-        ></textarea>
+{{ if eq .sumCheckInLogs 4 }}
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left">
+              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">Are you sure you want to proceed with the post-test? All your responses will be recorded. This action cannot be undone.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
+            <button class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full" onclick="showForm(event)">Proceed with Post-Test</button>
+          </div>
+        </div>
+         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left">
+              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">To proceed with the post-test, please provide your email address. This will be used to record your responses in the post-test form.</p>
+              </div>
+            </div>
+          </div>
+          <form action="/check-in/{{.plant.PlantID}}" method="POST" class="py-3 flex flex-col gap-2 mt-2">
+              <label for="user_input" class="text-sm font-semibold">Email</label>
+              <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
+              <input type="hidden" name="image" value="images.jpeg" />
+              <!-- <input type="hidden" name="status" value="true"> -->
+              <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Submit</button>
+          </form>
+        </div>
       </div>
-      <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Konfirmasi</button>
-    </form>
+    </div>
   </div>
-</dialog>
+</div>
+{{ else }}
+{{ end }}
 {{ end }}

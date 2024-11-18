@@ -1,0 +1,42 @@
+
+{{ define "content" }}
+{{ if .message }}
+  <div class="toastMessage toast toast-top toast-center transition-opacity duration-500 z-[9999]">
+    <div class="alert {{ if eq .status "success" }}alert-success{{ else }}alert-error{{ end }}">
+      <span class="text-white">{{ .message }}</span>
+    </div>
+  </div>
+{{ end }}
+
+<div class="h-[85vh] flex flex-col gap-3 items-center justify-center">  
+  <dialog id="logout_modal" class="modal">
+    <div class="modal-box max-w-sm">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <h3 class="text-lg font-bold">Logout</h3>
+      <form action="/logout" method="GET" class="mt-2 space-y-4">
+        <p class="text-sm text-gray-500">Are you sure you want to Log out?</p>
+        <button type="submit" class="btn btn-error text-white w-full">Konfirmasi</button>
+      </form>
+    </div>
+  </dialog>
+    
+  <p class="font-bold text-lg uppercase text-[#405944]">Your Profile</p>
+    <div class="p-8 bg-gray-100 rounded-xl z-[99] border-2">
+        <div class="w-full flex flex-col gap-4 justify-center items-center">
+            <div class="flex flex-col items-center gap-4">
+                <div class="avatar">
+                    <div class="w-24 rounded-full">
+                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                    </div>
+                </div>
+                <p class="text-md font-bold text-[#405944]">{{ .name }}</p>
+            </div>    
+        </div>
+        <div class="w-full flex justify-center mt-4">
+            <button class="w-fit btn btn-error text-white" onclick="logout_modal.showModal()">Logout</button>
+        </div>
+    </div>
+</div>
+{{ end }}
