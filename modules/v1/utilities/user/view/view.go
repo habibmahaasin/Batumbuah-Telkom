@@ -2,7 +2,6 @@ package view
 
 import (
 	"Batumbuah/pkg/helpers"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -59,8 +58,6 @@ func (h *userView) PlantDetail(c *gin.Context) {
         lastCheckIn := checkInLogs[len(checkInLogs)-1].DateCreated
         daysSinceLastCheckIn = int(time.Since(lastCheckIn).Hours() / 24)
     }
-
-    fmt.Println("sumCheckInLogs",len(checkInLogs))
 
     c.HTML(http.StatusOK, "plant_detail.html", gin.H{
         "title":               "Plant Detail",

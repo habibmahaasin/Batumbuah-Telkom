@@ -16,7 +16,51 @@
       </form>
       <h3 class="text-lg font-bold">Check In Form</h3>
       <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
-        <input type="hidden" name="image" value="images.jpeg" />
+        <input type="hidden" id="image_input" name="image" value="" />
+
+        <!-- Dropdown untuk memilih metode -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Pilih Metode</span>
+          </label>
+          <select id="method_selector" class="select select-bordered w-full">
+            <option value="">Pilih metode</option>
+            <option value="upload">Upload File</option>
+            <option value="camera">Buka Kamera</option>
+          </select>
+        </div>
+
+        <!-- Input file -->
+        <div id="file_upload_section" class="form-control hidden">
+          <label class="label">
+            <span class="label-text font-semibold">Upload File</span>
+          </label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            class="file-input file-input-bordered w-full"
+            accept="image/*"
+            value=""
+          />
+        </div>
+
+        <!-- Feed kamera dan tombol -->
+        <div id="camera_section" class="form-control hidden relative">
+          <video id="camera_feed" autoplay playsinline class="w-full h-auto"></video>
+          <button id="capture_button" type="button" class="btn mt-4 bg-[#276040] text-white w-fit absolute bottom-4 right-4 border-transparent">
+            <iconify-icon icon="uil:camera" class="text-[24px]"></iconify-icon>
+          </button>
+        </div>
+
+        <!-- Preview gambar -->
+        <div id="preview_section" class="form-control hidden relative">
+          <img id="image_preview" class="w-full rounded-lg border" alt="Preview Gambar" />
+          <button id="retake_button" type="button" class="btn mt-4 bg-gray-500 text-white w-fit absolute bottom-4 right-4 border-transparent">
+           <iconify-icon icon="material-symbols:reset-shutter-speed-rounded" class="text-[24px]"></iconify-icon>
+          </button>
+        </div>
+
         <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Note</span>
@@ -27,14 +71,24 @@
             placeholder="Enter a note (optional)"
           ></textarea>
         </div>
-        <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Konfirmasi</button>
+        <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">
+          Konfirmasi
+        </button>
       </form>
+
     </div>
   </dialog>
+
   <div class="fixed bottom-4 max-w-md w-full px-4">
-    <button class="w-full btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944]" onclick="check_in_modals.showModal()">Check In</button>
+    
+    {{ if eq .sumCheckInLogs 5 }}
+        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] disabled" disabled>Completed</button>
+    {{ else }}
+        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040]" onclick="check_in_modals.showModal()">Check In</button>
+    {{ end }}
+  </button>
   </div>
-  <div class="py-4 px-4 sticky top-0 z-[99] bg-[#405944] text-white shadow-xl">
+  <div class="py-4 px-4 sticky top-0 z-[99] bg-[#276040] text-white shadow-xl">
     <div class="w-full flex justify-between items-center">
       <a href="/">
         <iconify-icon icon="solar:square-alt-arrow-left-outline" class="text-[36px]"></iconify-icon>
@@ -45,11 +99,11 @@
     </div>
     <div class="pt-4">
       <ul class="steps w-full">
-        <li class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}">Week 1</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}">Pre Test</li>
         <li class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}">Week 2</li>
         <li class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}">Week 3</li>
         <li class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}">Week 4</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}">Week 5</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}">Post Test</li>
       </ul>
     </div>
   </div>
@@ -78,7 +132,7 @@
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
       <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-pretest">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-base font-semibold text-gray-900" id="modal-title">Pre-Test Confirmation</h3>
@@ -88,10 +142,10 @@
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full" onclick="showForm(event)">Proceed with Pre-Test</button>
+            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="showFormPreTest(event)">Proceed with Pre-Test</button>
           </div>
         </div>
-         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container">
+         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container-pretest">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-base font-semibold text-gray-900" id="modal-title">Pre-Test Confirmation</h3>
@@ -105,7 +159,7 @@
               <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
               <input type="hidden" name="image" value="images.jpeg" />
               <!-- <input type="hidden" name="status" value="true"> -->
-              <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Submit</button>
+              <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">Submit</button>
           </form>
         </div>
       </div>
@@ -121,7 +175,7 @@
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
       <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-posttest">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
@@ -131,10 +185,10 @@
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full" onclick="showForm(event)">Proceed with Post-Test</button>
+            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="showFormPostTest(event)">Proceed with Post-Test</button>
           </div>
         </div>
-         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container">
+         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container-posttest">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
@@ -148,8 +202,44 @@
               <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
               <input type="hidden" name="image" value="images.jpeg" />
               <!-- <input type="hidden" name="status" value="true"> -->
-              <button type="submit" class="btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] w-full">Submit</button>
+              <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">Submit</button>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ else }}
+{{ end }}
+
+{{ if eq .sumCheckInLogs 5 }}
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true" id="modal-container">
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" id="modal-backdrop"></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
+        <button 
+          class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 focus:outline-none" 
+          onclick="closeModal()"
+          aria-label="Close modal"
+        >
+          &times;
+        </button>
+        
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-posttest">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left">
+              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Rewards</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">Congratulations! You have successfully completed all the tasks. Claim your reward now!</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
+            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="window.open('https://api.whatsapp.com/send?phone=6281372255130', '_blank')">
+                Claim
+            </button>
+          </div>
         </div>
       </div>
     </div>

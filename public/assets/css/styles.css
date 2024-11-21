@@ -3,3 +3,10 @@
   background-color: #e79a3f !important;
   color: white !important;
 }
+
+.bg-batumbuah {
+  background-image: url(../img/batumbuah-background.svg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

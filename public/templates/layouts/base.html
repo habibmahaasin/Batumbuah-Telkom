@@ -79,15 +79,148 @@
       });
     }, 2000);
 
-    function showForm(event) {
+    function showFormPreTest(event) {
       event.preventDefault();
-      const link = document.getElementById("proceed-link");
+      const link = document.getElementById("proceed-link-pretest");
       link.style.display = "none";
 
-      const formContainer = document.getElementById("form-container");
+      const formContainer = document.getElementById("form-container-pretest");
       formContainer.classList.remove("hidden");
 
       window.open("https://forms.gle/1jiPg6QsTpWdDsbd8", "_blank");
+    }
+
+    function showFormPostTest(event) {
+      event.preventDefault();
+      const link = document.getElementById("proceed-link-posttest");
+      link.style.display = "none";
+
+      const formContainer = document.getElementById("form-container-posttest");
+      formContainer.classList.remove("hidden");
+
+      window.open("https://forms.gle/DJAoj1VBg3s7Lh1P6", "_blank");
+    }
+  </script>
+
+  <!-- camera access -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const methodSelector = document.getElementById("method_selector");
+      const fileUploadSection = document.getElementById("file_upload_section");
+      const cameraSection = document.getElementById("camera_section");
+      const previewSection = document.getElementById("preview_section");
+      const cameraFeed = document.getElementById("camera_feed");
+      const captureButton = document.getElementById("capture_button");
+      const retakeButton = document.getElementById("retake_button");
+      const imagePreview = document.getElementById("image_preview");
+      const hiddenInput = document.getElementById("image_input");
+      let cameraStream = null;
+
+      // Fungsi untuk membuka kamera
+      const openCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+          });
+          cameraFeed.srcObject = stream;
+          cameraStream = stream;
+        } catch (error) {
+          console.error("Error accessing camera:", error);
+          alert("Tidak dapat mengakses kamera.");
+        }
+      };
+
+      // Fungsi untuk menutup kamera
+      const closeCamera = () => {
+        if (cameraStream) {
+          const tracks = cameraStream.getTracks();
+          tracks.forEach((track) => track.stop());
+          cameraFeed.srcObject = null;
+          cameraStream = null;
+        }
+      };
+
+      // Fungsi untuk menangkap gambar
+      const captureImage = () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.width = cameraFeed.videoWidth;
+        canvas.height = cameraFeed.videoHeight;
+
+        // Salin gambar dari video ke canvas
+        context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+
+        // Konversi canvas ke Base64
+        const imageData = canvas.toDataURL("image/jpeg");
+
+        // Simpan gambar dalam input hidden
+        hiddenInput.value = imageData;
+
+        // Tampilkan gambar pada preview
+        imagePreview.src = imageData;
+
+        // Ganti ke mode preview
+        cameraSection.classList.add("hidden");
+        previewSection.classList.remove("hidden");
+      };
+
+      // Fungsi untuk mengambil ulang gambar
+      const retakeImage = () => {
+        // Kosongkan input hidden
+        hiddenInput.value = "";
+
+        // Kembali ke mode kamera
+        previewSection.classList.add("hidden");
+        cameraSection.classList.remove("hidden");
+        openCamera();
+      };
+
+      // Event listener untuk dropdown
+      methodSelector.addEventListener("change", (e) => {
+        const selectedValue = e.target.value;
+
+        // Reset input tersembunyi
+        hiddenInput.value = "";
+
+        // Tampilkan bagian yang sesuai
+        if (selectedValue === "upload") {
+          fileUploadSection.classList.remove("hidden");
+          cameraSection.classList.add("hidden");
+          previewSection.classList.add("hidden");
+          closeCamera();
+        } else if (selectedValue === "camera") {
+          fileUploadSection.classList.add("hidden");
+          previewSection.classList.add("hidden");
+          cameraSection.classList.remove("hidden");
+          openCamera();
+        } else {
+          fileUploadSection.classList.add("hidden");
+          cameraSection.classList.add("hidden");
+          previewSection.classList.add("hidden");
+          closeCamera();
+        }
+      });
+
+      // Event listener untuk tombol tangkap gambar
+      captureButton.addEventListener("click", captureImage);
+
+      // Event listener untuk tombol ambil ulang
+      retakeButton.addEventListener("click", retakeImage);
+
+      // Menutup kamera saat modal ditutup
+      const modal = document.getElementById("check_in_modals");
+      modal.addEventListener("close", closeCamera);
+    });
+  </script>
+
+  <script>
+    function closeModal() {
+      const modalContainer = document.getElementById("modal-container");
+      const modalBackdrop = document.getElementById("modal-backdrop");
+
+      // Hide the modal by adding a class that sets display to none
+      modalContainer.style.display = "none";
+      modalBackdrop.style.display = "none";
     }
   </script>
 </html>

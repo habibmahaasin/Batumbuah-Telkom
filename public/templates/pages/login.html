@@ -7,11 +7,17 @@
 {{ end }}
 
 
-<div class="card-body flex flex-col justify-between min-h-screen">
-  <div class="w-full flex justify-center">
-    <h1 class="font-bold text-3xl">BATUMBUAH</h1>
+<div class="card-body !p-4 flex flex-col items-center justify-between min-h-screen" style="background-image: url(../../assets/img/batumbuah-background.svg); background-size: cover; background-position: center; background-repeat: no-repeat;">
+  <div class="w-fit flex flex-col gap-1 items-center px-4 py-2 justify-center mt-4 bg-[#276040] text-white">
+    <h1 class="font-bold text-3xl">"BATUMBUAH"</h1>
+    <div class="flex flex-col gap-0">
+      <p class="text-sm">Basamo Mangko Ka Tumbuah</p>
+      <p class="text-sm italic">Bersama Maka Akan Tumbuh</p>
+    </div>
   </div>
-  <form id="loginPage" method="POST" action="/login">
+  <div class="w-full bg-white p-4 rounded-2xl py-6 flex flex-col gap-4 shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px]">
+    <h1 class="font-bold text-2xl text-center">Login</h1>
+    <form id="loginPage" method="POST" action="/login">
     <div class="form-control mb-4">
       <label for="email" class="label">
         <span class="label-text">Email address</span>
@@ -36,7 +42,7 @@
         class="input input-bordered w-full"
       />
     </div>
-    <button type="submit" class="w-full btn bg-[#405944] text-white hover:bg-opacity-95 hover:bg-[#405944] mt-3">Login</button>
+    <button type="submit" class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] mt-3">Login</button>
   </form>
   <!-- <div class="flex justify-center mt-4">
     Belum punya akun?
@@ -45,5 +51,6 @@
   <div class="flex justify-center mt-4">
     Batumbuah 2024  
   </div>
-  {{ end }}
+  </div>
 </div>
+{{ end }}

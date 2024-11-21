@@ -13,7 +13,7 @@ type RegisterInput struct {
 }
 
 type CheckInInput struct {
-	Image string `json:"image" form:"image" binding:"required"`
+	Image string `json:"image" form:"image"`
 	Note  string `json:"note" form:"note"`
 }
 

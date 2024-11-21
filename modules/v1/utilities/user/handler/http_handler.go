@@ -3,7 +3,6 @@ package handler
 import (
 	"Batumbuah/modules/v1/utilities/user/models"
 	"Batumbuah/pkg/helpers"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -58,7 +57,6 @@ func (h *userHandler) Login(c *gin.Context) {
 	}
 
 	token, _ := h.jwtoken.GenerateToken(user.UserID, user.FullName, int(user.RoleID))
-	fmt.Println(token)
 	c.SetCookie("Token", token, 21600, "/", "localhost", false, true)
 
 	session.Set("email", user.Email)
@@ -138,7 +136,7 @@ func (h *userHandler) CheckIn(c *gin.Context) {
         return
     }
 
-    err := h.userService.CheckIn(userID, plantID, input.Image, input.Note)
+    err := h.userService.CheckIn(userID, plantID, "images.jpeg", input.Note)
     if err != nil {
         helpers.SetFlashMessage(c, "error", err.Error())
         c.Redirect(http.StatusFound, "/plant/" + plantID)
@@ -146,5 +144,5 @@ func (h *userHandler) CheckIn(c *gin.Context) {
     }
 
     helpers.SetFlashMessage(c, "success", "Check-in successful")
-    c.Redirect(http.StatusFound, "/plant/" + plantID)
+    c.Redirect(http.StatusFound, "/")
 }
