@@ -16,6 +16,7 @@ type Repository interface {
 	GetLastCheckInTime(UserPlantID string) (models.CheckInLog, error)
 	GetCheckInLogs(UserPlantID string) ([]models.CheckInLog, error)
 	GetPlantStatsById(plantID string) (models.PlantStats, error)
+	GetCheckInRule() (models.CheckInRule, error)
 }
 
 type repository struct {

@@ -128,3 +128,9 @@ func (r *repository) GetPlantStatsById(plantID string) (models.PlantStats, error
     err := r.db.Where("plant_id = ?", plantID).First(&plantStats).Error
     return plantStats, err
 }
+
+func (r *repository) GetCheckInRule() (models.CheckInRule, error) {
+    var checkInRule models.CheckInRule
+    err := r.db.First(&checkInRule).Error
+    return checkInRule, err
+}

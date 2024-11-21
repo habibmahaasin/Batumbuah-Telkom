@@ -57,3 +57,11 @@ type TestInformation struct {
     DateCreated time.Time `gorm:"column:date_created" json:"date_created"`
     DateUpdated time.Time `gorm:"column:date_updated" json:"date_updated"`
 }
+
+type CheckInRule struct {
+    ID          uint      `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
+    Name       string    `gorm:"column:name" json:"name"`
+    Range       int       `gorm:"column:range" json:"range"`
+    DateCreated time.Time `gorm:"column:date_created" json:"date_created"`
+    DateUpdated time.Time `gorm:"column:date_updated" json:"date_updated"`
+}

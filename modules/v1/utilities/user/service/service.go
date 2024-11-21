@@ -112,9 +112,16 @@ func (s *service) CheckIn(userID, plantID, image, note string) error {
         }
         return err 
     }
+
+	checkInRule, err := s.repository.GetCheckInRule()
+	if err != nil {
+        return err
+    }
 	
-    if time.Since(lastCheckIn.DateCreated) < 7*24*time.Hour {
-        return errors.New("check-in allowed only once every 7 days")
+    allowedInterval := time.Duration(checkInRule.Range) * 24 * time.Hour
+
+    if time.Since(lastCheckIn.DateCreated) < allowedInterval {
+        return fmt.Errorf("check-in allowed only once every %d days", checkInRule.Range)
     }
 
     return s.repository.PlantCheckIn(plantID, image, note)

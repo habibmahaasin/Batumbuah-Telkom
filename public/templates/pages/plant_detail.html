@@ -79,10 +79,9 @@
     </div>
   </dialog>
 
-  <div class="fixed bottom-4 max-w-md w-full px-4">
-    
+  <div class="fixed bottom-4 max-w-md w-full px-4 z-[9999]">
     {{ if eq .sumCheckInLogs 5 }}
-        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] disabled" disabled>Completed</button>
+        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] border-none" onclick="showClaimRewards(event)">Claim Reward</button>
     {{ else }}
         <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040]" onclick="check_in_modals.showModal()">Check In</button>
     {{ end }}
@@ -100,9 +99,9 @@
     <div class="pt-4">
       <ul class="steps w-full">
         <li class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}">Pre Test</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}">Week 2</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}">Week 3</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}">Week 4</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}">Week 1</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}">Week 2</li>
+        <li class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}">Week 3</li>
         <li class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}">Post Test</li>
       </ul>
     </div>
@@ -112,16 +111,25 @@
      <h4 class="uppercase text-[#e79a3f] font-bold mb-1 text-center">No Check in history Available</h4>
     {{ else }}
       <h4 class="uppercase text-[#e79a3f] font-bold mb-1">Check in history</h4>
-      {{ range .checkInLogs }}
-        <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
-          <div class="collapse-title text-md font-sm"><b>Check In : </b>{{ .FormattedDateCreated }}</div>
-          <div class="collapse-content text-xs flex flex-col gap-2">
-            <img src="../../assets/img/image-placeholder.webp" class="w-full h-48 object-cover rounded-md" />
-            <p><b>Note :</b> {{ .Note }}</p>
-            <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ .FormattedDateCreated }}</p>
+      {{ range $index, $log := .checkInLogs }}
+          <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
+               {{ if or (eq $index 0) (eq $index 4) }}
+                  <div class="collapse-title text-md font-sm"><b>Complete Test : </b>{{ $log.FormattedDateCreated }}</div>
+                  <div class="collapse-content text-xs flex flex-col gap-2">
+                      <p><b>Email :</b> {{ $log.Note }}</p>
+                      <p class="border-t pt-2 mt-2"><b>Complete Test :</b> {{ $log.FormattedDateCreated }}</p>
+                  </div>
+              {{ else }}
+                  <div class="collapse-title text-md font-sm"><b>Check In : </b>{{ $log.FormattedDateCreated }}</div>
+                  <div class="collapse-content text-xs flex flex-col gap-2">
+                      <img src="../../assets/img/image-placeholder.webp" class="w-full h-48 object-cover rounded-md" />
+                      <p><b>Note :</b> {{ $log.Note }}</p>
+                      <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ $log.FormattedDateCreated }}</p>
+                  </div>
+              {{ end }}
           </div>
-        </div>
       {{ end }}
+
     {{ end }}
   </div>
 </div>
@@ -225,8 +233,7 @@
         >
           &times;
         </button>
-        
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-posttest">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="reward-modal">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-base font-semibold text-gray-900" id="modal-title">Rewards</h3>

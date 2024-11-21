@@ -23,5 +23,6 @@ func Init(conf config.Conf) *gorm.DB {
 	// Db.AutoMigrate(&models.PlantStats{})
 	// Db.AutoMigrate(&models.TestInformation{})
 	// Db.AutoMigrate(&models.CheckInLog{})
+	// Db.AutoMigrate(&models.CheckInRule{})
 	return Db
 }
