@@ -134,3 +134,39 @@ func (r *repository) GetCheckInRule() (models.CheckInRule, error) {
     err := r.db.First(&checkInRule).Error
     return checkInRule, err
 }
+
+func (r *repository) UpdatePreTestStatus(plantID string, status bool) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Model(&models.PlantStats{}).
+            Where("plant_id = ?", plantID).
+            Update("is_pre_tested", status).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+}
+
+func (r *repository) UpdatePostTestStatus(PlantID string , status bool) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Model(&models.PlantStats{}).
+            Where("plant_id = ?", PlantID).
+            Update("is_post_tested", status).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+} 
+
+func (r *repository) UpdateRedeemRewardStatus(PlantID string , status bool) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Model(&models.PlantStats{}).
+            Where("plant_id = ?", PlantID).
+            Update("is_available_to_redeem", status).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+}

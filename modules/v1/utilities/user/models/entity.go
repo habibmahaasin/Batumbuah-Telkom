@@ -25,6 +25,7 @@ type UserPlant struct {
     CheckInLogs     []CheckInLog    `gorm:"foreignKey:UserPlantID;references:PlantID;constraint:OnDelete:CASCADE;"`
     PlantStats      PlantStats      `gorm:"foreignKey:PlantID;references:PlantID;constraint:OnDelete:CASCADE;"`
     TestInformation TestInformation `gorm:"foreignKey:PlantID;references:PlantID;constraint:OnDelete:CASCADE;"`
+    FormattedDateCreated string `gorm:"-" json:"formatted_date_created"`
 }
 
 // CheckInLog model definition

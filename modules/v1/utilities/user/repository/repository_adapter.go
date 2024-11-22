@@ -17,6 +17,9 @@ type Repository interface {
 	GetCheckInLogs(UserPlantID string) ([]models.CheckInLog, error)
 	GetPlantStatsById(plantID string) (models.PlantStats, error)
 	GetCheckInRule() (models.CheckInRule, error)
+	UpdatePreTestStatus(plantID string, status bool) error
+	UpdatePostTestStatus(plantID string, status bool) error
+	UpdateRedeemRewardStatus(plantID string, status bool) error
 }
 
 type repository struct {

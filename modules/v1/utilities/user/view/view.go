@@ -30,6 +30,11 @@ func (h *userView) Index(c *gin.Context) {
     plantLists, _ := h.userService.GetPlantByUserID(userID.(string))
     status, message := helpers.GetAndClearFlashMessage(c)
 
+    for i := range plantLists {
+    plantLists[i].DateCreated = plantLists[i].DateCreated.In(time.Local)
+    plantLists[i].FormattedDateCreated = plantLists[i].DateCreated.Format("2006-01-02 15:04:05")
+}
+
     c.HTML(http.StatusOK, "index.html", gin.H{
         "title":       "Index",
         "status":      status,

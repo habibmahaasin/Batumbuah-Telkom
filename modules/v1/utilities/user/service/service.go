@@ -107,11 +107,24 @@ func (s *service) CheckIn(userID, plantID, image, note string) error {
 
     lastCheckIn, err := s.repository.GetLastCheckInTime(plantID)
     if err != nil {
-        if err.Error() == "no check-in found for the plant" {
-            return s.repository.PlantCheckIn(plantID, image, note)
-        }
-        return err 
-    }
+		if err.Error() == "no check-in found for the plant" {
+			if updateErr := s.repository.UpdatePreTestStatus(plantID, true); updateErr != nil {
+				return updateErr
+			}
+			return s.repository.PlantCheckIn(plantID, image, note)
+		}
+		return err
+	}
+
+	plantStats , err := s.repository.GetPlantStatsById(plantID)
+	if err != nil {
+		return err
+	}
+
+	if plantStats.TotalCheckIn == 4 {
+		s.repository.UpdateRedeemRewardStatus(plantID, true)
+		s.repository.UpdatePostTestStatus(plantID, true)
+	}
 
 	checkInRule, err := s.repository.GetCheckInRule()
 	if err != nil {

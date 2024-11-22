@@ -1,25 +1,88 @@
-
-{{ define "content" }}
-{{ if .message }}
-  <div class="toastMessage toast toast-top toast-center transition-opacity duration-500 z-[9999]">
-    <div class="alert {{ if eq .status "success" }}alert-success{{ else }}alert-error{{ end }}">
-      <span class="text-white">{{ .message }}</span>
+{{ define "content" }} {{ if .message }} {{ if eq .status "success" }}
+<div
+  class="relative z-10"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+  id="modal-container"
+>
+  <div
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+    aria-hidden="true"
+    id="modal-backdrop"
+  ></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div
+      class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+    >
+      <div
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
+      >
+        <button
+          class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+          onclick="closeModal()"
+          aria-label="Close modal"
+        >
+          &times;
+        </button>
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="reward-modal">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left">
+              <div class="w-full flex justify-center">
+                <img src="../../assets/img/coin.png" class="w-48 h-48" />
+              </div>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Congratulations!
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">{{ .message }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
+            <a
+              href="/"
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+            >
+              Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-{{ end }}
+</div>
+{{ else }}
+<div
+  class="toastMessage toast toast-top toast-center transition-opacity duration-500 z-[9999]"
+>
+  <div class="alert alert-error">
+    <span class="text-white">{{ .message }}</span>
+  </div>
+</div>
+{{ end }} {{ end }}
 
-<div class="h-[85vh] flex flex-col gap-3">  
+<div class="h-[85vh] flex flex-col gap-3">
   <dialog id="check_in_modals" class="modal">
     <div class="modal-box max-w-sm">
       <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+          ✕
+        </button>
       </form>
       <h3 class="text-lg font-bold">Check In Form</h3>
-      <form action="/check-in/{{.plant.PlantID}}" method="POST" class="mt-6 space-y-4">
+      <form
+        action="/check-in/{{.plant.PlantID}}"
+        method="POST"
+        class="mt-6 space-y-4"
+      >
         <input type="hidden" id="image_input" name="image" value="" />
 
         <!-- Dropdown untuk memilih metode -->
-        <div class="form-control">
+        <!-- <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Pilih Metode</span>
           </label>
@@ -28,10 +91,10 @@
             <option value="upload">Upload File</option>
             <option value="camera">Buka Kamera</option>
           </select>
-        </div>
+        </div> -->
 
         <!-- Input file -->
-        <div id="file_upload_section" class="form-control hidden">
+        <div id="file_upload_section" class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Upload File</span>
           </label>
@@ -47,17 +110,37 @@
 
         <!-- Feed kamera dan tombol -->
         <div id="camera_section" class="form-control hidden relative">
-          <video id="camera_feed" autoplay playsinline class="w-full h-auto"></video>
-          <button id="capture_button" type="button" class="btn mt-4 bg-[#276040] text-white w-fit absolute bottom-4 right-4 border-transparent">
+          <video
+            id="camera_feed"
+            autoplay
+            playsinline
+            class="w-full h-auto"
+          ></video>
+          <button
+            id="capture_button"
+            type="button"
+            class="btn mt-4 bg-[#276040] text-white w-fit absolute bottom-4 right-4 border-transparent"
+          >
             <iconify-icon icon="uil:camera" class="text-[24px]"></iconify-icon>
           </button>
         </div>
 
         <!-- Preview gambar -->
         <div id="preview_section" class="form-control hidden relative">
-          <img id="image_preview" class="w-full rounded-lg border" alt="Preview Gambar" />
-          <button id="retake_button" type="button" class="btn mt-4 bg-gray-500 text-white w-fit absolute bottom-4 right-4 border-transparent">
-           <iconify-icon icon="material-symbols:reset-shutter-speed-rounded" class="text-[24px]"></iconify-icon>
+          <img
+            id="image_preview"
+            class="w-full rounded-lg border"
+            alt="Preview Gambar"
+          />
+          <button
+            id="retake_button"
+            type="button"
+            class="btn mt-4 bg-gray-500 text-white w-fit absolute bottom-4 right-4 border-transparent"
+          >
+            <iconify-icon
+              icon="material-symbols:reset-shutter-speed-rounded"
+              class="text-[24px]"
+            ></iconify-icon>
           </button>
         </div>
 
@@ -71,163 +154,347 @@
             placeholder="Enter a note (optional)"
           ></textarea>
         </div>
-        <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">
+        <button
+          type="submit"
+          class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+        >
           Konfirmasi
         </button>
       </form>
-
     </div>
   </dialog>
 
   <div class="fixed bottom-4 max-w-md w-full px-4 z-[9]">
-    {{ if eq .sumCheckInLogs 5 }}
-        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] border-none" onclick="showClaimRewards(event)">Claim Reward</button>
+    {{ if and .plantStats.IsAvailableToRedeem (not .plantStats.IsRedeemedReward)
+    }}
+    <button
+      class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] border-none"
+      onclick="showClaimRewards(event)"
+    >
+      Claim Reward
+    </button>
+    {{ else if and .plantStats.IsAvailableToRedeem .plantStats.IsRedeemedReward
+    }}
+    <button
+      class="w-full btn bg-gray-500 text-white cursor-not-allowed"
+      disabled
+    >
+      Reward Claimed
+    </button>
     {{ else }}
-        <button class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040]" onclick="check_in_modals.showModal()">Check In</button>
+    <button
+      class="w-full btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040]"
+      onclick="check_in_modals.showModal()"
+    >
+      Check In
+    </button>
     {{ end }}
-  </button>
   </div>
   <div class="py-4 px-4 sticky top-0 z-[99] bg-[#276040] text-white shadow-xl">
     <div class="w-full flex justify-between items-center">
       <a href="/">
-        <iconify-icon icon="solar:square-alt-arrow-left-outline" class="text-[36px]"></iconify-icon>
+        <iconify-icon
+          icon="solar:square-alt-arrow-left-outline"
+          class="text-[36px]"
+        ></iconify-icon>
       </a>
-      <div class="flex flex-col gap-0">
+      <div class="flex gap-2 items-center">
         <p class="text-md font-bold uppercase">{{ .plant.Name }}</p>
+        <div
+          class="bg-[#E79A3F] rounded-[12px] px-2 py-1 text-xs flex items-center gap-1"
+        >
+          <iconify-icon
+            icon="mdi:star-four-points-circle-outline"
+          ></iconify-icon>
+          {{ .plantStats.TotalCheckIn }} Points
+        </div>
       </div>
     </div>
     <div class="pt-4">
       <ul class="steps w-full">
-        <li class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}">Pre Test</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}">Week 1</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}">Week 2</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}">Week 3</li>
-        <li class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}">Post Test</li>
+        <li
+          class="step font-normal {{if ge .sumCheckInLogs 1}}step-primary text-[#E79A3F]{{end}}"
+        >
+          Pre Test
+        </li>
+        <li
+          class="step font-normal {{if ge .sumCheckInLogs 2}}step-primary text-[#E79A3F]{{end}}"
+        >
+          Week 1
+        </li>
+        <li
+          class="step font-normal {{if ge .sumCheckInLogs 3}}step-primary text-[#E79A3F]{{end}}"
+        >
+          Week 2
+        </li>
+        <li
+          class="step font-normal {{if ge .sumCheckInLogs 4}}step-primary text-[#E79A3F]{{end}}"
+        >
+          Week 3
+        </li>
+        <li
+          class="step font-normal {{if ge .sumCheckInLogs 5}}step-primary text-[#E79A3F]{{end}}"
+        >
+          Post Test
+        </li>
       </ul>
     </div>
   </div>
   <div class="flex flex-col gap-2 px-4 mt-4">
     {{ if eq .sumCheckInLogs 0 }}
-     <h4 class="uppercase text-[#e79a3f] font-bold mb-1 text-center">No Check in history Available</h4>
+    <h4 class="uppercase text-[#e79a3f] font-bold mb-1 text-center">
+      No Check in history Available
+    </h4>
     {{ else }}
-      <h4 class="uppercase text-[#e79a3f] font-bold mb-1">Check in history</h4>
-      {{ range $index, $log := .checkInLogs }}
-          <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
-               {{ if or (eq $index 0) (eq $index 4) }}
-                  <div class="collapse-title text-md font-sm"><b>Complete Test : </b>{{ $log.FormattedDateCreated }}</div>
-                  <div class="collapse-content text-xs flex flex-col gap-2">
-                      <p><b>Email :</b> {{ $log.Note }}</p>
-                      <p class="border-t pt-2 mt-2"><b>Complete Test :</b> {{ $log.FormattedDateCreated }}</p>
-                  </div>
-              {{ else }}
-                  <div class="collapse-title text-md font-sm"><b>Check In : </b>{{ $log.FormattedDateCreated }}</div>
-                  <div class="collapse-content text-xs flex flex-col gap-2">
-                      <img src="../../assets/img/image-placeholder.webp" class="w-full h-48 object-cover rounded-md" />
-                      <p><b>Note :</b> {{ $log.Note }}</p>
-                      <p class="border-t pt-2 mt-2"><b>Check In At :</b> {{ $log.FormattedDateCreated }}</p>
-                  </div>
-              {{ end }}
-          </div>
+    <h4 class="uppercase text-[#e79a3f] font-bold mb-1">Check in history</h4>
+    {{ range $index, $log := .checkInLogs }}
+    <div
+      tabindex="0"
+      class="collapse collapse-arrow border-base-300 bg-base-200 border"
+    >
+      {{ if or (eq $index 0) (eq $index 4) }}
+      <div class="collapse-title text-md font-sm">
+        <b>Complete Test : </b>{{ $log.FormattedDateCreated }}
+      </div>
+      <div class="collapse-content text-xs flex flex-col gap-2">
+        <p><b>Email :</b> {{ $log.Note }}</p>
+        <p class="border-t pt-2 mt-2">
+          <b>Complete Test :</b> {{ $log.FormattedDateCreated }}
+        </p>
+      </div>
+      {{ else }}
+      <div class="collapse-title text-md font-sm">
+        <b>Check In : </b>{{ $log.FormattedDateCreated }}
+      </div>
+      <div class="collapse-content text-xs flex flex-col gap-2">
+        <img
+          src="../../assets/img/image-placeholder.webp"
+          class="w-full h-48 object-cover rounded-md"
+        />
+        <p><b>Note :</b> {{ $log.Note }}</p>
+        <p class="border-t pt-2 mt-2">
+          <b>Check In At :</b> {{ $log.FormattedDateCreated }}
+        </p>
+      </div>
       {{ end }}
-
-    {{ end }}
+    </div>
+    {{ end }} {{ end }}
   </div>
 </div>
 
 {{ if eq .sumCheckInLogs 0 }}
-<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+<div
+  class="relative z-10"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+    aria-hidden="true"
+  ></div>
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-pretest">
+    <div
+      class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+    >
+      <div
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
+      >
+        <div
+          class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          id="proceed-link-pretest"
+        >
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Pre-Test Confirmation</h3>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Pre-Test Confirmation
+              </h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500">Are you sure you want to proceed with the pre-test? All your responses will be recorded. This action cannot be undone.</p>
+                <p class="text-sm text-gray-500">
+                  Are you sure you want to proceed with the pre-test? All your
+                  responses will be recorded. This action cannot be undone.
+                </p>
               </div>
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="showFormPreTest(event)">Proceed with Pre-Test</button>
+            <button
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+              onclick="showFormPreTest(event)"
+            >
+              Proceed with Pre-Test
+            </button>
           </div>
         </div>
-         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container-pretest">
+        <div
+          class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden"
+          id="form-container-pretest"
+        >
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Pre-Test Confirmation</h3>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Pre-Test Confirmation
+              </h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500">To proceed with the pre-test, please provide your email address. This will be used to record your responses in the pre-test form.</p>
+                <p class="text-sm text-gray-500">
+                  To proceed with the pre-test, please provide your email
+                  address. This will be used to record your responses in the
+                  pre-test form.
+                </p>
               </div>
             </div>
           </div>
-          <form action="/check-in/{{.plant.PlantID}}" method="POST" class="py-3 flex flex-col gap-2 mt-2">
-              <label for="user_input" class="text-sm font-semibold">Email</label>
-              <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
-              <input type="hidden" name="image" value="images.jpeg" />
-              <!-- <input type="hidden" name="status" value="true"> -->
-              <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">Submit</button>
+          <form
+            action="/check-in/{{.plant.PlantID}}"
+            method="POST"
+            class="py-3 flex flex-col gap-2 mt-2"
+          >
+            <label for="user_input" class="text-sm font-semibold">Email</label>
+            <input
+              type="email"
+              name="note"
+              id="note"
+              placeholder="Enter your response"
+              class="w-full p-2 border rounded"
+            />
+            <input type="hidden" name="image" value="images.jpeg" />
+            <!-- <input type="hidden" name="status" value="true"> -->
+            <button
+              type="submit"
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+            >
+              Submit
+            </button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-{{ else }}
-{{ end }}
-
-{{ if eq .sumCheckInLogs 4 }}
-<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+{{ else }} {{ end }} {{ if eq .sumCheckInLogs 4 }}
+<div
+  class="relative z-10"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+    aria-hidden="true"
+  ></div>
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="proceed-link-posttest">
+    <div
+      class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+    >
+      <div
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
+      >
+        <div
+          class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          id="proceed-link-posttest"
+        >
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Post-Test Confirmation
+              </h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500">Are you sure you want to proceed with the post-test? All your responses will be recorded. This action cannot be undone.</p>
+                <p class="text-sm text-gray-500">
+                  Are you sure you want to proceed with the post-test? All your
+                  responses will be recorded. This action cannot be undone.
+                </p>
               </div>
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="showFormPostTest(event)">Proceed with Post-Test</button>
+            <button
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+              onclick="showFormPostTest(event)"
+            >
+              Proceed with Post-Test
+            </button>
           </div>
         </div>
-         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden" id="form-container-posttest">
+        <div
+          class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 hidden"
+          id="form-container-posttest"
+        >
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Post-Test Confirmation</h3>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Post-Test Confirmation
+              </h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500">To proceed with the post-test, please provide your email address. This will be used to record your responses in the post-test form.</p>
+                <p class="text-sm text-gray-500">
+                  To proceed with the post-test, please provide your email
+                  address. This will be used to record your responses in the
+                  post-test form.
+                </p>
               </div>
             </div>
           </div>
-          <form action="/check-in/{{.plant.PlantID}}" method="POST" class="py-3 flex flex-col gap-2 mt-2">
-              <label for="user_input" class="text-sm font-semibold">Email</label>
-              <input type="email" name="note" id="note" placeholder="Enter your response" class="w-full p-2 border rounded">
-              <input type="hidden" name="image" value="images.jpeg" />
-              <!-- <input type="hidden" name="status" value="true"> -->
-              <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">Submit</button>
+          <form
+            action="/check-in/{{.plant.PlantID}}"
+            method="POST"
+            class="py-3 flex flex-col gap-2 mt-2"
+          >
+            <label for="user_input" class="text-sm font-semibold">Email</label>
+            <input
+              type="email"
+              name="note"
+              id="note"
+              placeholder="Enter your response"
+              class="w-full p-2 border rounded"
+            />
+            <input type="hidden" name="image" value="images.jpeg" />
+            <!-- <input type="hidden" name="status" value="true"> -->
+            <button
+              type="submit"
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+            >
+              Submit
+            </button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-{{ else }}
-{{ end }}
-
-{{ if eq .sumCheckInLogs 5 }}
-<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true" id="modal-container">
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" id="modal-backdrop"></div>
+{{ else }} {{ end }} {{ if and .plantStats.IsAvailableToRedeem (not
+.plantStats.IsRedeemedReward) }}
+<div
+  class="relative z-10"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+  id="modal-container"
+>
+  <div
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+    aria-hidden="true"
+    id="modal-backdrop"
+  ></div>
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-        <button 
-          class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 focus:outline-none" 
+    <div
+      class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+    >
+      <div
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
+      >
+        <button
+          class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
           onclick="closeModal()"
           aria-label="Close modal"
         >
@@ -236,15 +503,26 @@
         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" id="reward-modal">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Rewards</h3>
+              <h3
+                class="text-base font-semibold text-gray-900"
+                id="modal-title"
+              >
+                Rewards
+              </h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500">Congratulations! You have successfully completed all the tasks. Claim your reward now!</p>
+                <p class="text-sm text-gray-500">
+                  Congratulations! You have successfully completed all the
+                  tasks. Claim your reward now!
+                </p>
               </div>
             </div>
           </div>
           <div class="bg-gray-50 py-3 sm:flex sm:flex-row-reverse">
-            <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full" onclick="window.open('https://api.whatsapp.com/send?phone=6281372255130', '_blank')">
-                Claim
+            <button
+              class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full"
+              onclick="window.open('https://api.whatsapp.com/send?phone=6281372255130', '_blank')"
+            >
+              Claim
             </button>
           </div>
         </div>
@@ -252,6 +530,4 @@
     </div>
   </div>
 </div>
-{{ else }}
-{{ end }}
-{{ end }}
+{{ else }} {{ end }} {{ end }}

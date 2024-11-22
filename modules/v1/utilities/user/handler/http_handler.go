@@ -143,6 +143,6 @@ func (h *userHandler) CheckIn(c *gin.Context) {
         return
     }
 
-    helpers.SetFlashMessage(c, "success", "Check-in successful")
-    c.Redirect(http.StatusFound, "/")
+    helpers.SetFlashMessage(c, "success", "Check-in successful! Congratulations, you've earned 1 point!")
+    c.Redirect(http.StatusFound, "/plant/" + plantID)
 }
