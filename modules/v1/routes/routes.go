@@ -35,6 +35,8 @@ func Init(db *gorm.DB, conf config.Conf, router *gin.Engine) *gin.Engine {
 	user.POST("/register", userHandlerV1.Register)
 	user.POST("/login", userHandlerV1.Login)
 	user.GET("/logout", userHandlerV1.Logout)
+	user.POST("/create-object", userHandlerV1.CreateObject)
+	user.POST ("/upload-image", userHandlerV1.UploadImage)
 	user.POST("/register-plant", middlewares.IsLogin(), userHandlerV1.RegisterPlant)
 	user.POST("/check-in/:id", middlewares.IsLogin(), userHandlerV1.CheckIn)
 	// user.POST("/pretest-confirmation", middlewares.IsLogin(), userHandlerV1.UpdatePreTestStatus)

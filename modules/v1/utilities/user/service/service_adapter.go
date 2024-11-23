@@ -14,6 +14,8 @@ type Service interface {
 	CheckIn(userID, plantID, image, note string) error 
 	GetCheckInLogs(UserPlantID string) ([]models.CheckInLog, error)
 	GetPlantStatsById(plantID string) (models.PlantStats, error)
+	CreateS3Object(bucketName, key, content, region string) error
+	UploadImageToS3(bucketName, key string, content []byte, contentType, region string) error
 }
 
 type service struct {

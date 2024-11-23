@@ -1,7 +1,9 @@
 package view
 
 import (
+	"Batumbuah/app/config"
 	"Batumbuah/pkg/helpers"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -46,17 +48,22 @@ func (h *userView) Index(c *gin.Context) {
 }
 
 func (h *userView) PlantDetail(c *gin.Context) {
+    conf , _ := config.Init()
+    session := sessions.Default(c)
     plantID := c.Param("id")
+    userID := session.Get("user_id")
     status, message := helpers.GetAndClearFlashMessage(c)
 
     plant, _ := h.userService.GetPlantByID(plantID)
     checkInLogs, _ := h.userService.GetCheckInLogs(plantID)
     plantStats, _ := h.userService.GetPlantStatsById(plantID)
-    
-  for i := range checkInLogs {
-    checkInLogs[i].DateCreated = checkInLogs[i].DateCreated.In(time.Local)
-    checkInLogs[i].FormattedDateCreated = checkInLogs[i].DateCreated.Format("2006-01-02 15:04:05")
-}
+    Endpoint := conf.Storage.Endpoint
+
+    for i := range checkInLogs {
+        checkInLogs[i].DateCreated = checkInLogs[i].DateCreated.In(time.Local)
+        checkInLogs[i].FormattedDateCreated = checkInLogs[i].DateCreated.Format("2006-01-02 15:04:05")
+        checkInLogs[i].Image = Endpoint + "/user-" + fmt.Sprintf("%v", userID) + "/" + checkInLogs[i].UserPlantID + "/" + checkInLogs[i].Image
+    }
 
     daysSinceLastCheckIn := 0
     if len(checkInLogs) > 0 {
@@ -73,6 +80,7 @@ func (h *userView) PlantDetail(c *gin.Context) {
         "sumCheckInLogs":      len(checkInLogs),
         "daysSinceLastCheckIn": daysSinceLastCheckIn,
         "plantStats":          plantStats,
+        "userID":              userID,
     })
 }
 

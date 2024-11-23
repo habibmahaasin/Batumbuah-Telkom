@@ -1,11 +1,22 @@
 package service
 
 import (
+	appConfig "Batumbuah/app/config"
 	"Batumbuah/modules/v1/utilities/user/models"
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"strings"
 	"time"
 
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,7 +39,7 @@ func (n *service) Login(input models.LoginInput) (models.User, error) {
 }
 
 func (s *service) Register(fullName, email, password, address string, roleID int) error {
-
+	conf , _ := appConfig.Init()
 	existingUser, err := s.repository.GetUserByEmail(email)
 	if err != nil {
 		return err
@@ -45,23 +56,39 @@ func (s *service) Register(fullName, email, password, address string, roleID int
 	}
 
 	user := &models.User{
-		UserID:   userID,
-		FullName: fullName,
-		Email:    email,
-		Password: string(hashedPassword),
-		Address:  address,
-		RoleID:   int64(roleID),
-		DateCreated:        time.Now(),
-        DateUpdated:        time.Now(),
+		UserID:      userID,
+		FullName:    fullName,
+		Email:       email,
+		Password:    string(hashedPassword),
+		Address:     address,
+		RoleID:      int64(roleID),
+		DateCreated: time.Now(),
+		DateUpdated: time.Now(),
 	}
 
-	return s.repository.CreateUser(user)
+	if err := s.repository.CreateUser(user); err != nil {
+		return err
+	}
+
+	bucketName := conf.Storage.Bucket
+	key := fmt.Sprintf("user-%s/", userID)
+	content := "Initial content for user folder"
+	region := conf.Storage.Region
+
+	if err := s.CreateS3Object(bucketName, key, content, region); err != nil {
+		return fmt.Errorf("failed to create S3 bucket: %w", err)
+	}
+
+	return nil
 }
 
+
 func (s *service) RegisterPlant(userID, name, email string) error {
+	conf , _ := appConfig.Init()
+	plantID := uuid.New().String()
     userPlant := &models.UserPlant{
         UserID:  userID,
-        PlantID: uuid.New().String(),
+        PlantID: plantID,
         Name:    name,
         DateCreated: time.Now(),
         DateUpdated: time.Now(),
@@ -84,6 +111,15 @@ func (s *service) RegisterPlant(userID, name, email string) error {
         DateCreated: time.Now(),
         DateUpdated: time.Now(),
     }
+
+	bucketName := conf.Storage.Bucket
+	key := fmt.Sprintf("user-%s/%s/", userID, plantID)
+	content := "Initial content for user plant"
+	region := conf.Storage.Region
+
+	if err := s.CreateS3Object(bucketName, key, content, region); err != nil {
+		return fmt.Errorf("failed to create S3 bucket: %w", err)
+	}
 
     return s.repository.RegisterPlant(userPlant, plantStats, testInfo)
 }
@@ -148,6 +184,78 @@ func (s *service) GetCheckInLogs(UserPlantID string) ([]models.CheckInLog, error
 func (s *service) GetPlantStatsById(plantID string) (models.PlantStats, error) {
 	return s.repository.GetPlantStatsById(plantID)
 }
+
+func (s *service) CreateS3Object(bucketName, key, content, region string) error {
+	conf , _ := appConfig.Init()
+    staticCreds := aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(
+       conf.Storage.Access_Key, conf.Storage.Private_Key,
+        "",
+    ))
+
+    cfg, err := config.LoadDefaultConfig(context.TODO(),
+        config.WithRegion(region),
+        config.WithCredentialsProvider(staticCreds),
+    )
+    if err != nil {
+        return err
+    }
+
+    client := s3.NewFromConfig(cfg)
+
+    var contentReader io.Reader
+    if content == "" {
+        key = strings.TrimSuffix(key, "/") + "/"
+        contentReader = bytes.NewReader([]byte{})
+    } else {
+        contentReader = strings.NewReader(content)
+    }
+
+    _, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
+        Bucket: aws.String(bucketName),
+        Key:    aws.String(key),
+        Body:   contentReader,
+    })
+    if err != nil {
+        return err
+    }
+
+    log.Printf("Object %s created successfully in bucket %s", key, bucketName)
+    return nil
+}
+
+func (s *service) UploadImageToS3(bucketName, key string, content []byte, contentType, region string) error {
+	conf , _ := appConfig.Init()
+
+    staticCreds := aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(
+       conf.Storage.Access_Key, conf.Storage.Private_Key,
+        "",
+    ))
+
+    cfg, err := config.LoadDefaultConfig(context.TODO(),
+        config.WithRegion(region),
+        config.WithCredentialsProvider(staticCreds),
+    )
+    if err != nil {
+        return err
+    }
+
+    client := s3.NewFromConfig(cfg)
+
+    _, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
+        Bucket:      aws.String(bucketName),
+        Key:         aws.String(key),
+        Body:        bytes.NewReader(content),
+        ContentType: aws.String(contentType),
+    })
+    if err != nil {
+        return err
+    }
+
+    log.Printf("Image %s uploaded successfully to bucket %s", key, bucketName)
+    return nil
+}
+
+
 
 // func (s *service) GetUserStats(userID string) (models.UserStats, error) {
 // 	return s.repository.GetUserStats(userID)

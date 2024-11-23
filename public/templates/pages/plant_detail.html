@@ -78,6 +78,7 @@
         action="/check-in/{{.plant.PlantID}}"
         method="POST"
         class="mt-6 space-y-4"
+        enctype="multipart/form-data"
       >
         <input type="hidden" id="image_input" name="image" value="" />
 
@@ -240,7 +241,7 @@
       </ul>
     </div>
   </div>
-  <div class="flex flex-col gap-2 px-4 mt-4">
+  <div class="flex flex-col gap-2 px-4 mt-4 pb-24">
     {{ if eq .sumCheckInLogs 0 }}
     <h4 class="uppercase text-[#e79a3f] font-bold mb-1 text-center">
       No Check in history Available
@@ -267,10 +268,7 @@
         <b>Check In : </b>{{ $log.FormattedDateCreated }}
       </div>
       <div class="collapse-content text-xs flex flex-col gap-2">
-        <img
-          src="../../assets/img/image-placeholder.webp"
-          class="w-full h-48 object-cover rounded-md"
-        />
+        <img src="{{ $log.Image }}" class="w-full object-cover rounded-md" />
         <p><b>Note :</b> {{ $log.Note }}</p>
         <p class="border-t pt-2 mt-2">
           <b>Check In At :</b> {{ $log.FormattedDateCreated }}
