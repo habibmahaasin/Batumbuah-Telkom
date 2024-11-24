@@ -128,12 +128,11 @@ func (h *userHandler) GetPlantByUserID(c *gin.Context) {
 		"data":   plants,
 	})
 }
-
 func (h *userHandler) CheckIn(c *gin.Context) {
     session := sessions.Default(c)
     userID := session.Get("user_id").(string)
     plantID := c.Param("id")
-	conf, _ := config.Init()
+    conf, _ := config.Init()
 
     var input models.CheckInInput
     if err := c.ShouldBind(&input); err != nil {
@@ -142,13 +141,25 @@ func (h *userHandler) CheckIn(c *gin.Context) {
         return
     }
 
-    var buffer []byte
-    var contentType string
-    var err error
     var imageName string
-
     imageFile, err := c.FormFile("image")
     if err == nil && imageFile != nil {
+        timestamp := time.Now().Format("20060102_150405")
+        ext := "jpeg"
+        imageName = fmt.Sprintf("%s_%s.%s", plantID, timestamp, ext)
+    }
+
+    err = h.userService.CheckIn(userID, plantID, imageName, input.Note)
+    if err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/plant/"+plantID)
+        return
+    }
+
+    if imageName != "" {
+        var buffer []byte
+        var contentType string
+
         buffer, _, contentType, err = h.readFile(c)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{
@@ -192,10 +203,6 @@ func (h *userHandler) CheckIn(c *gin.Context) {
 
         buffer = compressedBuffer.Bytes()
 
-        timestamp := time.Now().Format("20060102_150405")
-        ext := "jpeg"
-
-        imageName = fmt.Sprintf("%s_%s.%s", plantID, timestamp, ext)
         key := fmt.Sprintf("user-%s/%s/%s", userID, plantID, imageName)
 
         err = h.uploadImageToS3(conf.Storage.Bucket, key, buffer, "image/jpeg")
@@ -206,13 +213,6 @@ func (h *userHandler) CheckIn(c *gin.Context) {
             })
             return
         }
-    }
-
-    err = h.userService.CheckIn(userID, plantID, imageName, input.Note)
-    if err != nil {
-        helpers.SetFlashMessage(c, "error", err.Error())
-        c.Redirect(http.StatusFound, "/plant/"+plantID)
-        return
     }
 
     helpers.SetFlashMessage(c, "success", "Check-in successful! Congratulations, you've earned 1 point!")
