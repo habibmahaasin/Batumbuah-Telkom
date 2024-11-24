@@ -16,6 +16,9 @@ type Service interface {
 	GetPlantStatsById(plantID string) (models.PlantStats, error)
 	CreateS3Object(bucketName, key, content, region string) error
 	UploadImageToS3(bucketName, key string, content []byte, contentType, region string) error
+	UpdatePlantName(PlantID string, name string) error
+	DeletePlant(PlantID string) error
+	UpdatePassword(userID, oldPassword string, newPassword string) error
 }
 
 type service struct {

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -32,7 +33,6 @@ func (n *service) Login(input models.LoginInput) (models.User, error) {
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		fmt.Println(err)
 		return user, errors.New("password yang Anda masukan salah/tidak terdaftar")
 	}
 	return user, nil
@@ -255,30 +255,45 @@ func (s *service) UploadImageToS3(bucketName, key string, content []byte, conten
     return nil
 }
 
+func (s *service) UpdatePlantName(PlantID string, name string) error {
+	return s.repository.UpdatePlantName(PlantID, name)
+}
+
+func (s *service) DeletePlant(PlantID string) error {
+	return s.repository.DeletePlant(PlantID)
+}
+
+func (s *service) UpdatePassword(userID, oldPassword, newPassword string) error {
+   	isValidPassword := func(password string) bool {
+    return len(password) >= 8 &&
+        regexp.MustCompile(`[A-Z]`).MatchString(password) &&
+        regexp.MustCompile(`\d`).MatchString(password)
+	}
+
+    if !isValidPassword(newPassword) {
+        return fmt.Errorf("password format is invalid, please refer to the password policy")
+    }
 
 
-// func (s *service) GetUserStats(userID string) (models.UserStats, error) {
-// 	return s.repository.GetUserStats(userID)
-// }
+    currentPasswordHash, err := s.repository.GetPasswordHash(userID)
+    if err != nil {
+        return fmt.Errorf("failed to retrieve current password: %v", err)
+    }
 
-// func (s *service) UpdatePreTestStatus(userID string, email string, status bool) error {
-// 	err := s.repository.UpdateTestInformation(models.TestInformation{
-// 		UserID: userID,
-// 		Email:  email,
-// 	})
-	
-// 	if err != nil {
-// 		return fmt.Errorf("failed to create test information: %w", err)
-// 	}
+    err = bcrypt.CompareHashAndPassword([]byte(currentPasswordHash), []byte(oldPassword))
+    if err != nil {
+        return fmt.Errorf("old password does not match")
+    }
 
-// 	err = s.repository.UpdateUserStats(userID, models.UserStats{
-// 		UserID:      userID,
-// 		IsPreTested: status,
-// 		DateUpdated: time.Now(),
-// 	})
-// 	if err != nil {
-// 		return fmt.Errorf("failed to update user stats: %w", err)
-// 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("failed to hash new password: %v", err)
+    }
 
-// 	return nil
-// }
+    err = s.repository.UpdatePassword(userID, string(hashedPassword))
+    if err != nil {
+        return fmt.Errorf("failed to update password: %v", err)
+    }
+
+    return nil
+}

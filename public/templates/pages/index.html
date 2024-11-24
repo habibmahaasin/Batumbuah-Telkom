@@ -7,6 +7,57 @@
     </div>
   </div>
 {{ end }}
+
+  <dialog id="delete_confirmation" class="modal">
+    <div class="modal-box max-w-sm">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <div class="modal-body flex flex-col gap-2">
+        <h4 class="font-bold text-md text-center">Delete Confirmation</h4>
+        <p class="text-center text-sm">Are you sure want to delete this plant?</p>
+        <form action="/delete-plant" method="post" class="flex gap-2 justify-between mt-4">
+          <button onclick="delete_confirmation.close()" class="btn btn-white w-[48%]">
+            Cancel
+          </button>
+          <button type="submit" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-[48%]">
+            Confirm
+          </button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="update_data_modal" class="modal">
+    <div class="modal-box max-w-sm">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <form action="/update-plant-name" method="post" class="modal-body flex flex-col gap-2">
+        <h4 class="font-bold text-md text-center">Update Name</h4>
+        <input type="text" name="name" id="name" class="input input-bordered" placeholder="Plant Name" />
+        <button class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">
+          Save
+        </button>
+      </form>
+    </div>
+  </dialog>
+  
+  <dialog id="action_modal" class="modal">
+    <div class="modal-box max-w-sm">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <div class="modal-body flex flex-col gap-2">
+        <h4 class="font-bold text-md text-center">Action</h4>
+        <button onclick="openUpdateModal(); action_modal.close()" class="btn bg-[#276040] text-white hover:bg-opacity-95 hover:bg-[#276040] w-full">
+            Update Name
+        </button>
+        <button onclick="openDeleteModal(); action_modal.close()" class="btn btn-error w-full text-white">Delete Plant</button>
+      </div>
+    </div>
+  </dialog>
+
   <div class="px-4 py-4 relative min-h-screen flex flex-col gap-4">
     <div class="min-h-[85vh] flex flex-col gap-3 pb-24">
       <div class="py-4 px-4 sticky top-0 bg-white z-[99]">
@@ -17,23 +68,36 @@
           </div>
           <div class="avatar">
             <div class="w-12 rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              <img src="../../assets/img/batumbuah-icon.png" />
             </div>
           </div>
         </div>
       </div>
       {{ range .plantLists }}
-      <a href="/plant/{{ .PlantID}}" class="py-4 px-4 bg-gray-100 rounded-lg">
-        <div class="flex gap-4 items-center">
+      <a href="/plant/{{ .PlantID }}" class="py-4 px-4 bg-gray-100 rounded-lg flex items-center justify-between">
+        <div class="flex gap-4 items-center relative">
           <div class="avatar">
-            <div class="w-fit h-fit rounded-lg bg-[#276040]/20">
+            <div class="w-fit h-16 rounded-lg bg-[#276040]/20">
               <img src="../../assets/img/plant-1.svg" class="w-auto h-auto" />
             </div>
           </div>
-          <div>
-            <h4 class="text-md font-bold capitalize text-[#276040]">{{ .Name }}</h4>
-            <h6 class="text-xs"><b>Started :</b> {{ .FormattedDateCreated }}</h6>
+          <div class="flex flex-col gap-2">
+            <div>
+              <h4 class="text-md font-bold capitalize text-[#276040]">{{ .Name }}</h4>
+              <h6 class="text-xs"><b>Started :</b> {{ .FormattedDateCreated }}</h6>
+            </div>
+            {{ if .PlantStats.IsRedeemedReward }}
+              <p class="text-[10px] w-fit bg-success text-white py-1 px-3 rounded-xl">Reward Claimed</p>
+            {{ else }}
+              <p class="text-[10px] w-fit bg-gray-400 text-white py-1 px-3 rounded-xl">Progress : {{ .PlantStats.TotalCheckIn }} / 5</p>
+            {{ end }}
           </div>
+        </div>
+        <div
+          onclick="event.preventDefault(); event.stopPropagation(); openActionModal('{{ .PlantID }}')"
+          class="bg-gray-200 flex item-center justify-center px-1 py-2 rounded-lg hover:bg-gray-300"
+        >
+          <iconify-icon icon="fe:elipsis-v" class="text-[24px]"></iconify-icon>
         </div>
       </a>
       {{ end }}

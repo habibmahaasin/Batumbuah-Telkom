@@ -44,10 +44,13 @@ func (r *repository) RegisterPlant(plant *models.UserPlant, plantStats *models.P
         return nil
     })
 }
-
 func (r *repository) GetPlantByUserID(userID string) ([]models.UserPlant, error) {
     var userPlant []models.UserPlant
-    err := r.db.Where("user_id = ?", userID).Find(&userPlant).Error
+    err := r.db.
+        Where("user_id = ?", userID).
+        Preload("PlantStats").
+        Order("date_created DESC").
+        Find(&userPlant).Error
     return userPlant, err
 }
 
@@ -166,6 +169,46 @@ func (r *repository) UpdateRedeemRewardStatus(PlantID string , status bool) erro
             Update("is_available_to_redeem", status).Error; err != nil {
             return err
         }
+
+        return nil
+    })
+}
+
+func (r *repository) UpdatePlantName(PlantID string, name string) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Model(&models.UserPlant{}).
+            Where("plant_id = ?", PlantID).
+            Update("name", name).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+}
+
+func (r *repository) DeletePlant(PlantID string) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Where("plant_id = ?", PlantID).Delete(&models.UserPlant{}).Error; err != nil {
+            return err
+        }
+
+        return nil
+    })
+}
+
+func (r *repository) GetPasswordHash(userID string) (string, error) {
+    var user models.User
+    err := r.db.Where("user_id = ?", userID).First(&user).Error
+    return user.Password, err
+}
+
+func (r *repository) UpdatePassword(userID string, newPassword string) error {
+    return r.db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Model(&models.User{}).
+            Where("user_id = ?", userID).
+            Update("password", newPassword).Error; err != nil {
+            return err
+            }
 
         return nil
     })

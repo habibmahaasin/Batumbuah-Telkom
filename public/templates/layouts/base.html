@@ -10,6 +10,7 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="icon" href="../../assets/img/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/css/styles.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
@@ -39,11 +40,13 @@
     </script>
   </head>
   <style>
+    :root,
     .container {
       overflow-y: scroll !important;
       scrollbar-width: none !important;
     }
 
+    :root::-webkit-scrollbar,
     .container::-webkit-scrollbar {
       display: none !important;
     }
@@ -227,9 +230,44 @@
       const modalContainer = document.getElementById("modal-container");
       const modalBackdrop = document.getElementById("modal-backdrop");
 
-      // Hide the modal by adding a class that sets display to none
       modalContainer.style.display = "none";
       modalBackdrop.style.display = "none";
+    }
+  </script>
+
+  <script>
+    let currentPlantID = null;
+
+    function openActionModal(plantId) {
+      currentPlantID = plantId;
+      document.querySelector("#action_modal").showModal();
+    }
+
+    function openUpdateModal() {
+      if (currentPlantID) {
+        const updateForm = document.querySelector(
+          '#update_data_modal form[action^="/update-plant-name"]'
+        );
+        if (updateForm) {
+          updateForm.setAttribute(
+            "action",
+            `/update-plant-name/${currentPlantID}`
+          );
+        }
+        document.querySelector("#update_data_modal").showModal();
+      }
+    }
+
+    function openDeleteModal() {
+      if (currentPlantID) {
+        const updateForm = document.querySelector(
+          '#delete_confirmation form[action^="/delete-plant"]'
+        );
+        if (updateForm) {
+          updateForm.setAttribute("action", `/delete-plant/${currentPlantID}`);
+        }
+        document.querySelector("#delete_confirmation").showModal();
+      }
     }
   </script>
 </html>

@@ -14,7 +14,7 @@ type RegisterInput struct {
 
 type CheckInInput struct {
 	// Image string `json:"image" form:"image"`
-	Note  string `json:"note" form:"note"`
+	Note string `json:"note" form:"note"`
 }
 
 type PreTestStatusInput struct {
@@ -27,12 +27,21 @@ type RegisterPlantInput struct {
 }
 
 type CreateObjectInput struct {
-    BucketName string `json:"bucketName" binding:"required"` // Name of the bucket
-    Key        string `json:"key" binding:"required"`        // Key for the file/folder (path)
-    Content    string `json:"content"`                       // Content of the file (empty for folder)
+	BucketName string `json:"bucketName" binding:"required"` // Name of the bucket
+	Key        string `json:"key" binding:"required"`        // Key for the file/folder (path)
+	Content    string `json:"content"`                       // Content of the file (empty for folder)
 }
 
 type UploadImageInput struct {
-    BucketName string `form:"bucketName" binding:"required"` // Name of the target bucket
-    Key        string `form:"key" binding:"required"`        // S3 object key (path/filename)
+	BucketName string `form:"bucketName" binding:"required"` // Name of the target bucket
+	Key        string `form:"key" binding:"required"`        // S3 object key (path/filename)
+}
+
+type UpdatePlantNameInput struct {
+	Name string `json:"name" form:"name" binding:"required"`
+}
+
+type UpdatePasswordInput struct {
+	OldPassword string `json:"old_password" form:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" form:"new_password" binding:"required"`
 }

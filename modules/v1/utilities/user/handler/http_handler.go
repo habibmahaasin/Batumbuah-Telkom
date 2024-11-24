@@ -135,8 +135,6 @@ func (h *userHandler) CheckIn(c *gin.Context) {
     plantID := c.Param("id")
 	conf, _ := config.Init()
 
-	fmt.Println("conf.Storage.Bucket",conf.Storage.Bucket)
-
     var input models.CheckInInput
     if err := c.ShouldBind(&input); err != nil {
         helpers.SetFlashMessage(c, "error", err.Error())
@@ -302,4 +300,61 @@ func (h *userHandler) UploadImage(c *gin.Context) {
         "status":  "success",
         "message": "Image uploaded successfully",
     })
+}
+
+func (h *userHandler) UpdatePlantName(c *gin.Context) {
+    plantID := c.Param("id")
+    var input models.UpdatePlantNameInput
+
+    if err := c.ShouldBind(&input); err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/")
+        return
+    }
+
+    err := h.userService.UpdatePlantName(plantID, input.Name)
+    if err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/")
+        return
+    }
+
+    helpers.SetFlashMessage(c, "success", "Plant name updated successfully")
+    c.Redirect(http.StatusFound, "/")
+}
+
+func (h *userHandler) DeletePlant(c *gin.Context) {
+    plantID := c.Param("id")
+
+    err := h.userService.DeletePlant(plantID)
+    if err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/")
+        return
+    }
+
+    helpers.SetFlashMessage(c, "success", "Plant deleted successfully")
+    c.Redirect(http.StatusFound, "/")
+}
+
+func (h *userHandler) UpdatePassword(c *gin.Context) {
+    session := sessions.Default(c)
+    userID := session.Get("user_id").(string)
+
+    var input models.UpdatePasswordInput
+    if err := c.ShouldBind(&input); err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/profile")
+        return
+    }
+
+    err := h.userService.UpdatePassword(userID, input.OldPassword, input.NewPassword)
+    if err != nil {
+        helpers.SetFlashMessage(c, "error", err.Error())
+        c.Redirect(http.StatusFound, "/profile")
+        return
+    }
+
+    helpers.SetFlashMessage(c, "success", "Password updated successfully")
+    c.Redirect(http.StatusFound, "/profile")
 }

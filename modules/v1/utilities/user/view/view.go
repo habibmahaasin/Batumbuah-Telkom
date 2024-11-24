@@ -81,6 +81,7 @@ func (h *userView) PlantDetail(c *gin.Context) {
         "daysSinceLastCheckIn": daysSinceLastCheckIn,
         "plantStats":          plantStats,
         "userID":              userID,
+        "plantID":             plantID,
     })
 }
 

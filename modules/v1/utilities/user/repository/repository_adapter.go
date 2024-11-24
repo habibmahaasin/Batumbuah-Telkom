@@ -20,6 +20,10 @@ type Repository interface {
 	UpdatePreTestStatus(plantID string, status bool) error
 	UpdatePostTestStatus(plantID string, status bool) error
 	UpdateRedeemRewardStatus(plantID string, status bool) error
+	UpdatePlantName(PlantID string, name string) error
+	DeletePlant(PlantID string) error
+	GetPasswordHash(userID string) (string, error)
+	UpdatePassword(userID string, newPassword string) error
 }
 
 type repository struct {
