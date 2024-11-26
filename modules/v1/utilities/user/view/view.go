@@ -4,6 +4,7 @@ import (
 	"Batumbuah/app/config"
 	"Batumbuah/pkg/helpers"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -25,6 +26,11 @@ func (h *userView) Register(c *gin.Context) {
 }
 
 func (h *userView) Index(c *gin.Context) {
+    location, err := time.LoadLocation("Asia/Jakarta")
+    if err != nil {
+        log.Fatalf("Failed to load time location: %v", err)
+    }
+
     session := sessions.Default(c)
     email := session.Get("email")
     name := session.Get("full_name")
@@ -33,12 +39,12 @@ func (h *userView) Index(c *gin.Context) {
     status, message := helpers.GetAndClearFlashMessage(c)
 
     for i := range plantLists {
-    plantLists[i].DateCreated = plantLists[i].DateCreated.In(time.Local)
-    plantLists[i].FormattedDateCreated = plantLists[i].DateCreated.Format("2006-01-02 15:04:05")
-}
+        plantLists[i].DateCreated = plantLists[i].DateCreated.In(location)
+        plantLists[i].FormattedDateCreated = plantLists[i].DateCreated.Format("02-01-2006 15:04:05")
+    }
 
     c.HTML(http.StatusOK, "index.html", gin.H{
-        "title":       "Index",
+        "title":       "Home",
         "status":      status,
         "message":     message,
         "email":       email,
@@ -53,6 +59,10 @@ func (h *userView) PlantDetail(c *gin.Context) {
     plantID := c.Param("id")
     userID := session.Get("user_id")
     status, message := helpers.GetAndClearFlashMessage(c)
+    location, err := time.LoadLocation("Asia/Jakarta")
+    if err != nil {
+        log.Fatalf("Failed to load time location: %v", err)
+    }
 
     plant, _ := h.userService.GetPlantByID(plantID)
     checkInLogs, _ := h.userService.GetCheckInLogs(plantID)
@@ -60,8 +70,8 @@ func (h *userView) PlantDetail(c *gin.Context) {
     Endpoint := conf.Storage.Endpoint
 
     for i := range checkInLogs {
-        checkInLogs[i].DateCreated = checkInLogs[i].DateCreated.In(time.Local)
-        checkInLogs[i].FormattedDateCreated = checkInLogs[i].DateCreated.Format("2006-01-02 15:04:05")
+        checkInLogs[i].DateCreated = checkInLogs[i].DateCreated.In(location)
+        checkInLogs[i].FormattedDateCreated = checkInLogs[i].DateCreated.Format("02-01-2006 15:04:05")
         checkInLogs[i].Image = Endpoint + "/user-" + fmt.Sprintf("%v", userID) + "/" + checkInLogs[i].UserPlantID + "/" + checkInLogs[i].Image
     }
 
